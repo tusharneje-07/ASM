@@ -1,0 +1,69 @@
+section .data
+	nl db '',0xA
+section .bss
+	inp resb 128
+	rev resb 128
+	len resb 10
+	
+section .text 
+	global _start
+	
+_start:
+	mov rax,0
+	mov rdi,0
+	mov rsi,inp 
+	mov rdx,128
+	syscall
+	
+	;finding length
+	xor rcx,rcx
+	
+	mov rsi,inp
+	findlen:
+		mov al,byte [rsi+rcx]
+		cmp al,0xA
+		je done
+		cmp al,0
+		je done
+		inc rcx
+		jmp findlen
+	done:
+	mov [len],rcx
+	lea rsi,inp
+	lea rdi,rev
+	
+	dec rcx
+	rev_loop:
+		mov al, byte[rsi+rcx]
+		mov [rdi],al
+		inc rdi
+		dec rcx
+		jns rev_loop
+	
+	mov byte [rdi],0
+	
+	; print length
+	movzx rax,byte [len]
+	add rax,'0'
+	mov rsi,rsp
+	mov [rsi],rax
+	mov rax,1
+	mov rdi,1
+	mov rdx,1
+	syscall
+	
+	mov rax,1
+	mov rdi,1
+	mov rsi,nl
+	mov rdx,1
+	syscall
+	
+	
+	mov rax,1
+	mov rdi,1
+	lea rsi,rev
+	movzx rdx,byte [len]
+	syscall
+	
+	mov rax,60
+	syscall
