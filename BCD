@@ -1,0 +1,48 @@
+section .data
+	hex dq 0x000f
+	bcd db 5 dup('0')
+	
+section .text
+	global _start
+
+_start:
+	movzx rax,word [hex]
+	xor rcx,rcx
+	
+	convert:
+		xor rdx,rdx
+		mov rbx,10
+		div rbx
+		
+		add dl,'0'
+		mov [bcd+rcx], dl
+		inc rcx
+		
+		test ax,ax
+		jnz convert
+	
+	mov rsi,0
+	mov rdi,rcx
+	
+	dec rcx
+	
+	rev_loop:
+		cmp rsi,rdi
+		jz done
+		
+		dec rdi
+		mov al,[bcd+rsi]
+		mov bl,[bcd+rdi]
+		
+		mov [bcd+rsi],bl
+		mov [bcd+rdi],al
+		inc rsi
+		
+		jmp rev_loop
+	
+	done:
+	mov rax,1
+	mov rdi,1
+	mov rsi, bcd
+	mov rdx,5
+	syscall
