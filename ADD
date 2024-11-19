@@ -1,0 +1,63 @@
+section .data
+	nl db '',0xA
+
+section .bss
+	num1 resb 2
+	num2 resb 2
+	res resb 2
+	
+section .text
+	global _start
+_start:
+	mov rax,0
+	mov rdi,0
+	mov rsi,num1
+	mov rdx,2
+	syscall
+	
+	cmp byte [num1],0xA
+	je rmnl1
+	jmp next1
+	
+	rmnl1:
+		mov byte [num1],0
+	next1:
+	
+	mov rax,0
+	mov rdi,0
+	mov rsi,num2
+	mov rdx,2
+	syscall
+	
+	cmp byte [num2],0xA
+	je rmnl2
+	jmp next2
+	
+	rmnl2:
+		mov byte [num2],0
+	next2:
+		movzx rax,byte [num1]
+		sub rax,'0'
+		
+		movzx rbx,byte [num2]
+		sub rbx,'0'
+		
+		add rax,rbx
+		add rax,'0'
+		
+		mov [res],rax
+		
+		mov rax,1
+		mov rdi,1
+		mov rsi,res
+		mov rdx,2
+		syscall
+		
+		mov rax,1
+		mov rdi,1
+		mov rsi,nl
+		mov rdx,1
+		syscall
+		
+		mov rax,60
+		syscall
